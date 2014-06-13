@@ -37,7 +37,8 @@ Ordered lists:
 
 # Begin Cheat Sheet Here:
 
-## git clone url : Clone a repository into a new directory (Copy repo from GitHub onto your computer in current directory)
+## ``Git Pull``
+``Git Pull`` is used to pull the most recent changes from a remote git repository.
 
 
 
