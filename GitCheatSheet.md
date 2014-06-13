@@ -36,3 +36,11 @@ Ordered lists:
 5. this
 
 # Begin Cheat Sheet Here:
+
+## git clone url : Clone a repository into a new directory (Copy repo from GitHub onto your computer in current directory)
+
+
+
+## `git log`
+
+`git log` is used to display the history of commits in a specific repository. `git log --oneline` gives the same information in a simpler one line version.
