@@ -9,7 +9,9 @@
 
 ## This is a level 2 header
 
-### And so on...
+Level 2 headers are underlined with this particular stylesheet.
+
+### This is a level 3 header
 
 #### And so on...
 
