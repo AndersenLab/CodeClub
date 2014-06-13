@@ -45,11 +45,19 @@ Label 'A': file added to staging area
 Label 'AM': file modified after being added to staging area
 Leabl 'D': file deleted after last commit
 
+
+## `git clone url`
+
 ## ``Git Pull``
 ``Git Pull`` is used to pull the most recent changes from a remote git repository.
 
 
+Clone a repository into a new directory (Copy repo from GitHub onto your computer in current directory)
 
 ## `git log`
 
 `git log` is used to display the history of commits in a specific repository. `git log --oneline` gives the same information in a simpler one line version.
+
+## `git init`
+
+Initialize a directory for git **This mistake was added on purpose**
