@@ -118,7 +118,6 @@ cut -f 6 homologene.data | cut -c 1,2
 cut -f 6 homologene.data | cut -c 1,2 | sort
 cut -f 6 homologene.data | cut -c 1,2 | sort | uniq | parallel "grep {} homologene.data > {}.txt"
 
-
 # Loop over files using command substitution:
 for f in `ls *.txt`;
 do
@@ -169,3 +168,12 @@ parallel echo ::: A B C D E F G
 pip install pyp
 
 open "https://code.google.com/p/pyp/"
+
+# Other tools
+open "http://jeroenjanssens.com/2013/09/19/seven-command-line-tools-for-data-science.html"
+open "http://csvkit.readthedocs.org/en/0.7.3/"
+
+csvstat homologene.data
+csvsort -c 1,2 homologene.data 
+
+pip install csvkit

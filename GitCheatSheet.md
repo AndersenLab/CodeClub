@@ -37,7 +37,13 @@ Ordered lists:
 
 # Begin Cheat Sheet Here:
 
+<<<<<<< HEAD
 ## `git clone url`
+=======
+## ``Git Pull``
+``Git Pull`` is used to pull the most recent changes from a remote git repository.
+
+>>>>>>> 88c52348e2072ad95d66c49c2273ff61c33b60af
 
 Clone a repository into a new directory (Copy repo from GitHub onto your computer in current directory)
 
