@@ -1,0 +1,82 @@
+echo "Sync Profile Loaded"
+
+export PS1="\w 🍔  "
+alias refresh="source ~/.bash_profile"
+
+export PATH=/usr/local/bin:$PATH
+export PERL5LIB=/usr/local/Cellar/vcftools/0.1.11/lib/perl5/site_perl
+
+# Get working directory of frontmost finder window.
+cdf() {
+	target=`osascript -e 'tell application "Finder" to if (count of Finder windows) > 0 then get POSIX path of (target of front Finder window as text)'`
+	if [ "$target" != "" ]; then
+		cd "$target"; pwd
+	else
+		echo 'No Finder window found' >&2
+	fi
+}
+
+
+PATH="/Applications/Postgres.app/Contents/MacOS/bin:$PATH"
+
+export PYTHONPATH=/usr/local/bin/python
+
+# Create a symbolic link (if not exists) for sublime.
+if [ -e "/Applications/Sublime Text 2.app/Contents/SharedSupport/bin/subl" ]
+then
+	ln -f /Applications/Sublime\ Text\ 2.app/Contents/SharedSupport/bin/subl /usr/local/bin/subl
+fi
+
+
+if [ -e "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" ]
+then
+	ln -f "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/subl
+fi
+
+# Command Preferences
+alias cd..="cd .. && ls"
+alias h=history
+alias ls="ls -pG" #show directories
+alias l="ls -lhGgo" #show directories
+alias tarup="tar -zcf"
+alias tardown="tar -zxf"
+alias drb="cd ~/Dropbox"
+
+# Shortcuts
+alias dbx="cd ~/Dropbox/"
+
+# Hide the sync profile file (if not hidden!)
+chflags hidden ~/Dropbox/sync_profile.txt
+
+# Open manpage in browser
+function wman() {
+   url="man -w ${1} | sed 's#.*\(${1}.\)\([[:digit:]]\).*\$#http://developer.apple.com/documentation/Darwin/Reference/ManPages/man\2/\1\2.html#'"
+   open `eval $url`
+}
+
+function pman() {
+    man -t ${1} | open -f -a /Applications/Preview.app
+}
+
+# as suggested by Mendel Cooper in "Advanced Bash Scripting Guide"
+extract () {
+   if [ -f $1 ] ; then
+       case $1 in
+        *.tar.bz2)      tar xvjf $1 ;;
+        *.tar.gz)       tar xvzf $1 ;;
+        *.tar.xz)       tar Jxvf $1 ;;
+        *.bz2)          bunzip2 $1 ;;
+        *.rar)          unrar x $1 ;;
+        *.gz)           gunzip $1 ;;
+        *.tar)          tar xvf $1 ;;
+        *.tbz2)         tar xvjf $1 ;;
+        *.tgz)          tar xvzf $1 ;;
+        *.zip)          unzip $1 ;;
+        *.Z)            uncompress $1 ;;
+        *.7z)           7z x $1 ;;
+        *)              echo "don't know how to extract '$1'..." ;;
+       esac
+   else
+       echo "'$1' is not a valid file!"
+   fi
+}
