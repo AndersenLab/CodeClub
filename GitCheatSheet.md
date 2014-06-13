@@ -1,3 +1,5 @@
+<link href="https://raw.githubusercontent.com/jasonm23/markdown-css-themes/gh-pages/markdown7.css" rel="stylesheet"></link>
+
 # Andersen Lab git/GitHub Cheat Sheet
 
 ## Some markdown basics before we get started:
@@ -6,9 +8,6 @@
 # This is a level 1 header
 
 ## This is a level 2 header
-
-So is this
-----------
 
 ### And so on...
 
