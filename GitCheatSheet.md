@@ -36,3 +36,11 @@ Ordered lists:
 5. this
 
 # Begin Cheat Sheet Here:
+
+## `git status`
+Displays file modification and staging events since last commit.
+# 'git status’ : verbose output
+# 'git status -s’ : shortened output
+Label 'A': file added to staging area
+Label 'AM': file modified after being added to staging area
+Leabl 'D': file deleted after last commit
