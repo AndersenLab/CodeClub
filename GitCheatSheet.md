@@ -36,3 +36,7 @@ Ordered lists:
 5. this
 
 # Begin Cheat Sheet Here:
+
+## git clone url : Clone a repository into a new directory (Copy repo from GitHub onto your computer in current directory)
+
+
