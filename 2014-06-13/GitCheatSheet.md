@@ -2,62 +2,36 @@
 
 # Andersen Lab git/GitHub Cheat Sheet
 
-## Some markdown basics before we get started:
-
-
-# This is a level 1 header
-
-## This is a level 2 header
-
-Level 2 headers are underlined with this particular stylesheet.
-
-### This is a level 3 header
-
-#### And so on...
-
-You can make things bold like **this** or italic like *this*.
-
-You can make things look code-y like `this`.
-
-Unordered lists:
-
-- can
-- be
-- made
-- like
-- this
-
-Ordered lists:
-
-1. can
-2. be
-3. made
-4. like
-5. this
-
-# Begin Cheat Sheet Here:
-
-## `git status`
-Displays file modification and staging events since last commit.
-# 'git status’ : verbose output
-# 'git status -s’ : shortened output
-Label 'A': file added to staging area
-Label 'AM': file modified after being added to staging area
-Leabl 'D': file deleted after last commit
-
-
-## `git clone url`
-
-## ``Git Pull``
-``Git Pull`` is used to pull the most recent changes from a remote git repository.
-
-
-Clone a repository into a new directory (Copy repo from GitHub onto your computer in current directory)
-
-## `git log`
-
-`git log` is used to display the history of commits in a specific repository. `git log --oneline` gives the same information in a simpler one line version.
-
 ## `git init`
 
-Initialize a directory for git **This mistake was added on purpose**
+Initialize a git repository in the current directory. If you are not cloning a repository, this must be done first.
+
+## `git clone [url]`
+Clone a repository into a new directory (copy repo from GitHub or other remote site onto your computer in current directory). The url must end in `.git`.
+
+## `git pull [remote] [branch]`
+Pulling is used to pull the most recent changes from a remote git repository. The remote and branch options are not required if the repository has only one remote and one branch.
+
+## `git log`
+Used to display the history of commits in a specific repository. `git log --oneline` gives the same information in a simpler one line version. `git log --graph will print a prettified version of the log with branches and merges mapped out.
+
+## `git add [file]`
+Adds files to the staging area before they are committed.
+
+## `git commit -m "Some message here"`
+Commits the file(s)
+
+## `git push [remote] [branch]`
+Pushes all commits to the remote repository. GitHub is usually known as "origin". 
+
+## `git remote add [name] [url]`
+Adds a remote repository (i.e. a GitHub repository) to those tracked by the local git repository.
+
+# Basic Workflow
+
+Computer 1:
+init --> add --> commit --> push
+
+Computer 2:
+
+pull --> add --> commit --> push
