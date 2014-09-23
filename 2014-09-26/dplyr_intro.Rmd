@@ -1,0 +1,267 @@
+---
+title: "GWAS PROCESSING"
+output: html_document
+---
+
+
+```{r, results='hide', message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(hflights)
+```
+
+
+```{r}
+df <- tbl_df(hflights)
+```
+
+### filter()
+
+Subset rows of a data frame. The first argument is the name of the data frame, and the second and subsequent are filtering expressions evaluated in the context of that data frame
+
+```{r}
+Jan1 <- filter(df, Month == 1, DayofMonth == 1)
+
+JFMA <- filter(df, Month <= 4)
+
+JDf <- filter(df, Month == 1 | Month == 12)
+```
+
+### arrange()
+
+Reorder data frame. It takes a data frame, and a set of column names to order by.
+
+```{r}
+orderedDF <- arrange(df, DayofMonth,Month,Year)
+head(df)
+head(orderedDF)
+```
+
+**NOTE** default ordering for `arrange` is ascending 
+
+Use `desc()` to reverse default order
+
+```{r}
+DescorderedDF <- arrange(df, desc(DayofMonth),desc(Month),desc(Year))
+head(DescorderedDF)
+```
+
+### select()
+
+Select columns from a given data frame. Takes a data frame and a set of columns to keep (or eliminate)
+
+```{r}
+selectDF <- dplyr::select(df, Month, DayofMonth,UniqueCarrier, AirTime, ArrDelay)
+head(selectDF)
+```
+
+We can also selectively get rid of columns
+
+```{r}
+selectDF1 <- dplyr::select(df, -Month, -DayofMonth, -UniqueCarrier, -AirTime, -ArrDelay)
+head(selectDF1)
+```
+
+We can also select a range of columns
+
+```{r}
+selectDF2 <- dplyr::select(df, Year:DepDelay)
+head(selectDF2)
+```
+
+Similarly, we can eliminate columns from `Year:DepDelay` by `-(Year:DepDelay)`
+
+```{r}
+selectDF3 <- dplyr::select(df, -(Year:DepDelay))
+head(selectDF3)
+```
+
+We can also keep or eliminate columns that contain common strings
+
+```{r}
+selectDF4 <- dplyr::select(df, contains("Month"))
+head(selectDF4)
+```
+
+### mutate()
+
+This is used to add new columns to an exisiting data frame
+
+```{r}
+mutDF <- mutate(df, gain = ArrDelay - DepDelay, speed = Distance / AirTime * 60)
+```
+
+We can include conditionals while creating new columns!
+
+```{r}
+mutConDF <- mutate(df, MonthName = ifelse(Month == 1, "Jan",
+                                          ifelse(Month == 2, "Feb",
+                                                 ifelse(Month == 3, "Mar", "etc"))))
+
+mutConDF1 <- mutate(df, tripLength = ifelse(Distance >=3000, "Long",
+                                            ifelse(Distance >= 2000, "Medium",
+                                                   ifelse(Distance >= 100, "Short", "Consider Driving"))))
+```
+
+### group_by()
+
+Group data frame by unique occurences present in user input columns
+
+**Note** this becomes more useful later
+
+```{r}
+grpDF <- group_by(df, Month)
+grpDF
+```
+
+### summarise()
+
+Generate summary statistics for data
+
+```{r}
+sumDF <- summarise(df, delays = mean(DepDelay))
+sumDF
+
+sumDF <- summarise(df, delays = mean(DepDelay,na.rm=TRUE))
+sumDF
+
+grpSumDF <- summarise(grpDF, delays = mean(DepDelay,na.rm=TRUE))
+```
+
+**Notice** summary statistics are different for grouped data. Mean is generated for each of the grouping variables!
+
+#### Clear work space
+
+--------------
+
+# Exercise
+
+Perform the following tasks on the `hflights` data set
+
+1. Assign it to an object with a different name
+2. Keep flight data if travel distance is greater than 1000 miles
+3. Create a new column names `spDay` that splits up departure time into 4 categories (0-600, 601-1200, 1201-1800, 1801-2400). Name them `early morning` `late morning` `afternoon` `night`
+4. Eliminate all columns **EXCEPT** Month, Origin, spDay, UniqueCarrier, DepDelay
+5. Determine the mean departure delay for the remaining data that is grouped by all other variables
+6. Arrange the resulting data frame using time of day category and airline
+
+## Solution
+
+```{r}
+df <- hflights
+df1 <- filter(df, Distance < 1000, !is.na(DepTime))
+df2 <- mutate(df1, spDay = ifelse(DepTime > 1800, "night",
+                                ifelse(DepTime > 1200, "afternoon",
+                                       ifelse(DepTime > 600, "late morning", "early morning"))))
+df3 <- dplyr::select(df2, Month, Origin, spDay, UniqueCarrier, DepDelay)
+df4 <- group_by(df3, Month, Origin, spDay, UniqueCarrier)
+sumDF <- summarise(df4, avgDelay = mean(DepDelay, na.rm = TRUE))
+sumDF1 <- arrange(sumDF, spDay, UniqueCarrier)
+```
+
+**Cluttered workspace**
+
+## %>%
+
+Use the above chaining operator to join different commands together. Save computation time and don't clutter your workspace!
+
+#### Solution B
+
+```{r}
+df <- hflights
+
+df1 <- filter(df, Distance < 1000, !is.na(DepTime))%>%
+  mutate(spDay = ifelse(DepTime > 1800, "night",
+                                ifelse(DepTime > 1200, "afternoon",
+                                       ifelse(DepTime > 600, "late morning", "early morning"))))%>%
+  dplyr::select(Month, Origin, spDay, UniqueCarrier, DepDelay)%>%
+  group_by(Month, Origin, spDay, UniqueCarrier)%>%
+  summarise(avgDelay = mean(DepDelay, na.rm = TRUE))%>%
+  arrange(spDay, UniqueCarrier)
+```
+
+---------------
+
+# Visualize data ggplot()
+
+```{r}
+ggplot(df1)+
+  aes(x=UniqueCarrier, y = avgDelay)+
+  geom_boxplot()
+```
+
+
+
+```{r}
+ggplot(df1)+
+  aes(x=UniqueCarrier, y = avgDelay)+
+  geom_boxplot()+
+  facet_grid(spDay~.)
+```
+
+
+
+```{r}
+ggplot(df1)+
+  aes(x=UniqueCarrier, y = avgDelay)+
+  geom_boxplot()+
+  facet_grid(spDay~., scales = "free_y")
+```
+
+
+
+```{r}
+ggplot(df1)+
+  aes(x=UniqueCarrier, y = avgDelay)+
+  geom_jitter()+
+  geom_boxplot()+
+  facet_grid(spDay~., scales = "free_y")
+```
+
+
+
+```{r}
+ggplot(df1)+
+  aes(x=UniqueCarrier, y = avgDelay)+
+  geom_jitter()+
+  geom_boxplot(alpha=.5)+
+  facet_grid(spDay~., scales = "free_y")
+```
+
+
+```{r}
+ggplot(df1)+
+  aes(x=UniqueCarrier, y = avgDelay, fill = factor(spDay))+
+  geom_jitter()+
+  geom_boxplot(alpha=.5)+
+  facet_grid(spDay~., scales = "free_y")
+```
+
+
+```{r}
+ggplot(df1)+
+  aes(x=spDay, y = avgDelay)+
+  geom_jitter()+
+  geom_boxplot(alpha=.5,,outlier.colour = NA)
+```
+
+
+
+```{r}
+ggplot(df1)+
+  aes(x=spDay, y = avgDelay)+
+  geom_jitter(aes(color = factor(UniqueCarrier)))+
+  geom_boxplot(alpha=.5,,outlier.colour = NA)
+```
+
+
+```{r}
+
+```
+
+
+
+
+
+
