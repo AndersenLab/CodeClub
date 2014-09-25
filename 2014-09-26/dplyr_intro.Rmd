@@ -5,10 +5,12 @@ output: html_document
 
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
-library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(hflights)
+devtools::install_github("hadley/lazyeval")
+devtools::install_github("hadley/dplyr")
+library(dplyr)
 ```
 
 
@@ -16,7 +18,7 @@ library(hflights)
 df <- tbl_df(hflights)
 ```
 
-### filter()
+### filter() & slice()
 
 Subset rows of a data frame. The first argument is the name of the data frame, and the second and subsequent are filtering expressions evaluated in the context of that data frame
 
@@ -25,7 +27,9 @@ Jan1 <- filter(df, Month == 1, DayofMonth == 1)
 
 JFMA <- filter(df, Month <= 4)
 
-JDf <- filter(df, Month == 1 | Month == 12)
+JAA <- filter(df, Month == 1 & UniqueCarrier == "AA")
+
+SLdf <- slice(df, 1:200)
 ```
 
 ### arrange()
@@ -47,12 +51,14 @@ DescorderedDF <- arrange(df, desc(DayofMonth),desc(Month),desc(Year))
 head(DescorderedDF)
 ```
 
-### select()
+### select() and rename()
 
 Select columns from a given data frame. Takes a data frame and a set of columns to keep (or eliminate)
 
 ```{r}
 selectDF <- dplyr::select(df, Month, DayofMonth,UniqueCarrier, AirTime, ArrDelay)
+
+selectDF1 <- dplyr::select(df, month = Month)
 head(selectDF)
 ```
 
