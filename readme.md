@@ -18,5 +18,4 @@ This code club has includes a brief introduction to data manipulation and visual
 
 1. dplyr
 2. tidyr
-3. stringr (possibly)
-4. ggplot2
+3. ggplot2
