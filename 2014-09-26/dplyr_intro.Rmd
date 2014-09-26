@@ -8,15 +8,72 @@ output: html_document
 library(tidyr)
 library(ggplot2)
 library(hflights)
-devtools::install_github("hadley/lazyeval")
-devtools::install_github("hadley/dplyr")
+# devtools::install_github("hadley/lazyeval")
+# devtools::install_github("hadley/dplyr")
 library(dplyr)
 ```
 
+### Create working data frame
 
 ```{r}
 df <- tbl_df(hflights)
 ```
+
+Quick data visualization commands you should know
+
+1. **head()**
+2. **View()**
+3. **str()**
+4. **summary()**
+5. **df[1:5,]**
+6. **df[1:5,"Month"]**
+7. **df[1:5, c("Month", "FlightNum")]**
+
+## tidyr 
+
+Changing format of data frames 
+
+**Example data** [R-bloggers](http://www.r-bloggers.com/introducing-tidyr/)
+
+```{r}
+set.seed(10)
+messy <- data.frame(
+  id = 1:4,
+  trt = sample(rep(c('control', 'treatment'), each = 2)),
+  work.T1 = runif(4),
+  home.T1 = runif(4),
+  work.T2 = runif(4),
+  home.T2 = runif(4)
+)
+```
+
+### gather()
+
+From wide to long formatted data
+
+```{r}
+tidier <- gather(messy, key, value, -id, -trt)
+```
+
+### separate()
+
+Split a regular expression column into new columns based on a common delimiter
+
+```{r}
+tidy <- separate(tidier, key, into=c("location","time"), sep = "\\.")
+```
+
+### spread()
+
+Back to wide formated data (not used as often because long-formatted data is more widely used)
+
+```{r}
+spreadDF <- spread(tidier, key,value)
+```
+
+[Hadley's in-depth data structure rant](https://github.com/hadley/tidyr/blob/master/vignettes/tidy-data.Rmd)
+
+## dlyr
 
 ### filter() & slice()
 
@@ -38,8 +95,6 @@ Reorder data frame. It takes a data frame, and a set of column names to order by
 
 ```{r}
 orderedDF <- arrange(df, DayofMonth,Month,Year)
-head(df)
-head(orderedDF)
 ```
 
 **NOTE** default ordering for `arrange` is ascending 
@@ -48,7 +103,6 @@ Use `desc()` to reverse default order
 
 ```{r}
 DescorderedDF <- arrange(df, desc(DayofMonth),desc(Month),desc(Year))
-head(DescorderedDF)
 ```
 
 ### select() and rename()
@@ -59,35 +113,30 @@ Select columns from a given data frame. Takes a data frame and a set of columns 
 selectDF <- dplyr::select(df, Month, DayofMonth,UniqueCarrier, AirTime, ArrDelay)
 
 selectDF1 <- dplyr::select(df, month = Month)
-head(selectDF)
 ```
 
 We can also selectively get rid of columns
 
 ```{r}
 selectDF1 <- dplyr::select(df, -Month, -DayofMonth, -UniqueCarrier, -AirTime, -ArrDelay)
-head(selectDF1)
 ```
 
 We can also select a range of columns
 
 ```{r}
 selectDF2 <- dplyr::select(df, Year:DepDelay)
-head(selectDF2)
 ```
 
 Similarly, we can eliminate columns from `Year:DepDelay` by `-(Year:DepDelay)`
 
 ```{r}
 selectDF3 <- dplyr::select(df, -(Year:DepDelay))
-head(selectDF3)
 ```
 
 We can also keep or eliminate columns that contain common strings
 
 ```{r}
 selectDF4 <- dplyr::select(df, contains("Month"))
-head(selectDF4)
 ```
 
 ### mutate()
@@ -148,8 +197,8 @@ Perform the following tasks on the `hflights` data set
 1. Assign it to an object with a different name
 2. Keep flight data if travel distance is greater than 1000 miles
 3. Create a new column names `spDay` that splits up departure time into 4 categories (0-600, 601-1200, 1201-1800, 1801-2400). Name them `early morning` `late morning` `afternoon` `night`
-4. Eliminate all columns **EXCEPT** Month, Origin, spDay, UniqueCarrier, DepDelay
-5. Determine the mean departure delay for the remaining data that is grouped by all other variables
+4. Eliminate all columns **EXCEPT** Month, Origin, spDay, UniqueCarrier, DepDelay, Distance
+5. Determine the mean departure delay and distance travelled for the remaining data that is grouped by all other variables
 6. Arrange the resulting data frame using time of day category and airline
 
 ## Solution
@@ -160,9 +209,10 @@ df1 <- filter(df, Distance < 1000, !is.na(DepTime))
 df2 <- mutate(df1, spDay = ifelse(DepTime > 1800, "night",
                                 ifelse(DepTime > 1200, "afternoon",
                                        ifelse(DepTime > 600, "late morning", "early morning"))))
-df3 <- dplyr::select(df2, Month, Origin, spDay, UniqueCarrier, DepDelay)
+df3 <- dplyr::select(df2, Month, Origin, spDay, UniqueCarrier, DepDelay, Distance)
 df4 <- group_by(df3, Month, Origin, spDay, UniqueCarrier)
-sumDF <- summarise(df4, avgDelay = mean(DepDelay, na.rm = TRUE))
+sumDF <- summarise(df4, avgDelay = mean(DepDelay, na.rm = TRUE),
+                   avgDist = mean(Distance, na.rm = TRUE))
 sumDF1 <- arrange(sumDF, spDay, UniqueCarrier)
 ```
 
@@ -177,19 +227,25 @@ Use the above chaining operator to join different commands together. Save comput
 ```{r}
 df <- hflights
 
-df1 <- filter(df, Distance < 1000, !is.na(DepTime))%>%
+df1 <- df %>%
+  filter(Distance < 1000, !is.na(DepTime))%>%
   mutate(spDay = ifelse(DepTime > 1800, "night",
                                 ifelse(DepTime > 1200, "afternoon",
                                        ifelse(DepTime > 600, "late morning", "early morning"))))%>%
-  dplyr::select(Month, Origin, spDay, UniqueCarrier, DepDelay)%>%
+  dplyr::select(Month, Origin, spDay, UniqueCarrier, DepDelay, Distance)%>%
   group_by(Month, Origin, spDay, UniqueCarrier)%>%
-  summarise(avgDelay = mean(DepDelay, na.rm = TRUE))%>%
+  summarise(avgDelay = mean(DepDelay, na.rm = TRUE),
+            avgDist = mean(Distance, na.rm = TRUE))%>%
   arrange(spDay, UniqueCarrier)
+
+identical(df1, sumDF1)
 ```
 
 ---------------
 
 # Visualize data ggplot()
+
+### geom_boxplot()
 
 ```{r}
 ggplot(df1)+
@@ -197,7 +253,7 @@ ggplot(df1)+
   geom_boxplot()
 ```
 
-
+### facet_grid()
 
 ```{r}
 ggplot(df1)+
@@ -206,7 +262,7 @@ ggplot(df1)+
   facet_grid(spDay~.)
 ```
 
-
+Fix scales
 
 ```{r}
 ggplot(df1)+
@@ -215,7 +271,7 @@ ggplot(df1)+
   facet_grid(spDay~., scales = "free_y")
 ```
 
-
+### geom_jitter()
 
 ```{r}
 ggplot(df1)+
@@ -225,46 +281,103 @@ ggplot(df1)+
   facet_grid(spDay~., scales = "free_y")
 ```
 
-
-
-```{r}
-ggplot(df1)+
-  aes(x=UniqueCarrier, y = avgDelay)+
-  geom_jitter()+
-  geom_boxplot(alpha=.5)+
-  facet_grid(spDay~., scales = "free_y")
-```
-
+### Customization
 
 ```{r}
 ggplot(df1)+
   aes(x=UniqueCarrier, y = avgDelay, fill = factor(spDay))+
   geom_jitter()+
-  geom_boxplot(alpha=.5)+
+  geom_boxplot(alpha=.5,outlier.colour = NA)+
   facet_grid(spDay~., scales = "free_y")
 ```
 
+### geom_histogram() and geom_density()
 
 ```{r}
 ggplot(df1)+
-  aes(x=spDay, y = avgDelay)+
+  aes(x = avgDelay, fill = factor(spDay))+
+  geom_histogram(alpha=.5)
+
+ggplot(df1)+
+  aes(x = avgDelay, fill = factor(spDay))+
+  geom_density(alpha=.5)
+```
+
+### geom_point()
+
+```{r}
+ggplot(df1)+
+  aes(y=avgDelay, x = avgDist, color = factor(UniqueCarrier))+
+  geom_point()
+```
+
+### Make it ¡¡¡POP!!!
+
+You can control **ALL** aspects of your plot. Here is the Andersen lab presentation standard
+
+```{r}
+presentation <- theme(axis.text.x = element_text(size=16, face="bold", color="black"),
+                      axis.text.y = element_text(size=16, face="bold", color="black"),
+                      axis.title.x = element_text(size=20, face="bold", color="black"),
+                      axis.title.y = element_text(size=20, face="bold", color="black"),
+                      strip.text.x = element_text(size=20, face="bold", color="black"),
+                      strip.text.y = element_text(size=20, face="bold", color="black"),
+                      plot.title = element_text(size=24, face="bold"),
+                      legend.position = "none")
+
+ggplot(df1)+
+  aes(y=avgDelay, x = avgDist, color = factor(UniqueCarrier))+
+  geom_point()+ presentation +
+  labs(x = "Average Distance", y = "Average Delay", title = "ggplot2 Plot")
+```
+
+[Explore ggplot2 geoms](http://docs.ggplot2.org/0.9.3.1/index.html)
+[Explore ggplot2 themes](http://docs.ggplot2.org/dev/vignettes/themes.html)
+
+# Put it all together
+
+### Data -> tidyr -> dplyr -> ggplot
+
+```{r}
+cars <- tbl_df(mtcars)
+head(cars)
+```
+
+```{r}
+cars %>%
+  mutate(model = row.names(cars)) %>%
+  select(mpg, wt, hp, cyl, model) %>%
+  mutate(wtTra = wt*1000)%>%
+  select(-wt)%>%
+#   gather(feature, value, -model) %>% 
+  ggplot(.)+
+  aes(x = wtTra, y = mpg, color = factor(cyl))+
+  geom_point(size = 3)+
+  presentation+
+  labs(x = "Weight (kg)", y = "Miles per Gallon", title = "Cars 'n Stuff")
+```
+
+
+```{r}
+flowers <- tbl_df(iris)
+flowers
+```
+
+```{r}
+flowers %>%
+  gather(feature, value, -Species)%>%
+  separate(feature, into = c("Part","Measurement"))%>%
+  filter(Part == "Sepal")%>%
+  ggplot(.)+
+  aes(x = Species, y = value, fill = factor(Measurement))+
   geom_jitter()+
-  geom_boxplot(alpha=.5,,outlier.colour = NA)
+  geom_boxplot(alpha = .5, outlier.color = NA)+
+  facet_grid(Measurement~., scales = "free")+
+  presentation+
+  labs(title = "Sepal Measurements", y = "Inches (?)")
 ```
 
 
-
-```{r}
-ggplot(df1)+
-  aes(x=spDay, y = avgDelay)+
-  geom_jitter(aes(color = factor(UniqueCarrier)))+
-  geom_boxplot(alpha=.5,,outlier.colour = NA)
-```
-
-
-```{r}
-
-```
 
 
 
