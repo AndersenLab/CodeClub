@@ -159,7 +159,7 @@ mutConDF1 <- mutate(df, tripLength = ifelse(Distance >=3000, "Long",
                                                    ifelse(Distance >= 100, "Short", "Consider Driving"))))
 ```
 
-### group_by()
+### group_by() & distinct()
 
 Group data frame by unique occurences present in user input columns
 
@@ -167,8 +167,14 @@ Group data frame by unique occurences present in user input columns
 
 ```{r}
 grpDF <- group_by(df, Month)
-grpDF
 ```
+
+Pull out unique occurences from a dataframe
+
+```{r}
+dDF <- distinct(df, Month, UniqueCarrier)
+```
+
 
 ### summarise()
 
