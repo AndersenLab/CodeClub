@@ -388,7 +388,9 @@ flowers %>%
   labs(title = "Sepal Measurements", y = "Inches (?)")
 ```
 
+# Beers for Hadley
 
+![alt text](http://www.activebeergeek.com/wp-content/uploads/2012/02/Beer-paddle.jpg)
 
 
 
