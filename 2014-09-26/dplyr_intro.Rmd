@@ -184,6 +184,7 @@ sumDF
 grpSumDF <- summarise(grpDF, delays = mean(DepDelay,na.rm=TRUE))
 ```
 
+
 **Notice** summary statistics are different for grouped data. Mean is generated for each of the grouping variables!
 
 #### Clear work space
@@ -239,6 +240,16 @@ df1 <- df %>%
   arrange(spDay, UniqueCarrier)
 
 identical(df1, sumDF1)
+```
+
+### join()
+
+Merge two data frames by common variables 
+
+```{r}
+df2 <- df1%>%
+  select(-spDay)%>%
+  left_join(df,., by = c("Month", "Origin", "UniqueCarrier"))
 ```
 
 ---------------
