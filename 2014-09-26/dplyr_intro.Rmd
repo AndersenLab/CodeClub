@@ -1,5 +1,5 @@
 ---
-title: "GWAS PROCESSING"
+title: ""
 output: html_document
 ---
 
@@ -8,8 +8,10 @@ output: html_document
 library(tidyr)
 library(ggplot2)
 library(hflights)
+library(devtools)
 # devtools::install_github("hadley/lazyeval")
 # devtools::install_github("hadley/dplyr")
+# might have issues installing off github. just install dplyr from CRAN and you wont be able to use the following verbs (slice,rename,distinct)
 library(dplyr)
 ```
 
@@ -73,7 +75,7 @@ spreadDF <- spread(tidier, key,value)
 
 [Hadley's in-depth data structure rant](https://github.com/hadley/tidyr/blob/master/vignettes/tidy-data.Rmd)
 
-## dlyr
+## dplyr
 
 ### filter() & slice()
 
@@ -84,9 +86,15 @@ Jan1 <- filter(df, Month == 1, DayofMonth == 1)
 
 JFMA <- filter(df, Month <= 4)
 
+JFMA <- filter(df, Month != 4)
+
+JFMA <- filter(df, !is.na(Month))
+
 JAA <- filter(df, Month == 1 & UniqueCarrier == "AA")
 
 SLdf <- slice(df, 1:200)
+
+SLdf <- slice(df, n())
 ```
 
 ### arrange()
@@ -175,7 +183,6 @@ Pull out unique occurences from a dataframe
 dDF <- distinct(df, Month, UniqueCarrier)
 ```
 
-
 ### summarise()
 
 Generate summary statistics for data
@@ -212,7 +219,7 @@ Perform the following tasks on the `hflights` data set
 
 ```{r}
 df <- hflights
-df1 <- filter(df, Distance < 1000, !is.na(DepTime))
+df1 <- filter(df, Distance > 1000)
 df2 <- mutate(df1, spDay = ifelse(DepTime > 1800, "night",
                                 ifelse(DepTime > 1200, "afternoon",
                                        ifelse(DepTime > 600, "late morning", "early morning"))))
@@ -235,7 +242,7 @@ Use the above chaining operator to join different commands together. Save comput
 df <- hflights
 
 df1 <- df %>%
-  filter(Distance < 1000, !is.na(DepTime))%>%
+  filter(Distance > 1000)%>%
   mutate(spDay = ifelse(DepTime > 1800, "night",
                                 ifelse(DepTime > 1200, "afternoon",
                                        ifelse(DepTime > 600, "late morning", "early morning"))))%>%
@@ -291,6 +298,8 @@ ggplot(df1)+
 ### geom_jitter()
 
 ```{r}
+df1 <- na.omit(df1)
+
 ggplot(df1)+
   aes(x=UniqueCarrier, y = avgDelay)+
   geom_jitter()+
@@ -344,7 +353,7 @@ presentation <- theme(axis.text.x = element_text(size=16, face="bold", color="bl
 
 ggplot(df1)+
   aes(y=avgDelay, x = avgDist, color = factor(UniqueCarrier))+
-  geom_point()+ presentation +
+  geom_point()+presentation +
   labs(x = "Average Distance", y = "Average Delay", title = "ggplot2 Plot")
 ```
 
