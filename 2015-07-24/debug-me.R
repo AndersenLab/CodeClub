@@ -117,6 +117,7 @@ g <- function(num, vec) {
 
 
 
+
 # Works
 fworks(5, c(3,4,5,6,7,6,7,8))
 
@@ -228,5 +229,6 @@ f(5, c(3,4,5,6,7,6,7,8))
 
 
 # But what about for a call like this?
+debug(f)
 f(5, 1:10000)
 
